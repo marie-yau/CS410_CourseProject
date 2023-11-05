@@ -1,8 +1,10 @@
 import sys
 import pytoml
 import numpy as np
+from scipy.stats import uniform
 from meta.parameter_tuning.okapi_ndcg_estimator import OkapiBM25NdcgEstimator
 from meta.parameter_tuning.grid_search import perform_grid_search
+from meta.parameter_tuning.random_search import perform_random_search
 
 def process_cfg(cfg):
     with open(cfg, 'r') as fin:
@@ -41,6 +43,15 @@ if __name__ == '__main__':
     # cv is the number of folds for cross validation
     grid_search = perform_grid_search(estimator, param_grid, query_path, cv=3, verbose=3)
 
-    print('Best parameters: ', grid_search.best_params_)
-    print('Best score: ', grid_search.best_score_)
+    print('Best parameters (grid_search): ', grid_search.best_params_)
+    print('Best score (grid_search): ', grid_search.best_score_)
 
+
+    param_distributions = {
+        'k1': uniform(loc=1.6, scale=0.2),  # uniform distribution from 1.6 to 1.8
+        'b': uniform(loc=0.7, scale=0.1),  # uniform distribution from 0.7 to 0.8
+    }
+    random_search = perform_random_search(estimator, param_distributions, query_path, cv=3, verbose=3, n_iter=100)
+
+    print('Best parameters (random_search): ', random_search.best_params_)
+    print('Best score (random_search): ', random_search.best_score_)
