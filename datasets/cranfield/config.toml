@@ -16,3 +16,8 @@ filter = "default-unigram-chain"
 query-path = "datasets/cranfield/cranfield-queries.txt"
 query-id-start = 1
 
+
+[params-tuner]
+logging-level = 0
+split-ratio = 0.8
+cv = 3

@@ -7,6 +7,10 @@ class OkapiBM25NdcgEstimator(NdcgEstimator):
         self.k1 = k1
         self.b = b
         self.k3 = k3
+        self.ranker = metapy.index.OkapiBM25(self.k1, self.b, self.k3)
+        self.idx = metapy.index.make_inverted_index(self.cfg)
+        self.ev = metapy.index.IREval(self.cfg)
+        self.query = metapy.index.Document() 
 
     def fit(self, X, y=None):
         self.ranker = metapy.index.OkapiBM25(self.k1, self.b, self.k3)
