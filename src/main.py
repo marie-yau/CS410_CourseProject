@@ -3,6 +3,10 @@ import pytoml
 import numpy as np
 from scipy.stats import uniform
 from meta.parameter_tuning.okapi_ndcg_estimator import OkapiBM25NdcgEstimator
+from meta.parameter_tuning.pivoted_length_ndcg_estimator import PivotedLengthNdcgEstimator
+from meta.parameter_tuning.absolute_discount_ndcg_estimator import AbsoluteDiscountNdcgEstimator
+from meta.parameter_tuning.jelinek_mercer_ndcg_estimator import JelinekMercerNdcgEstimator
+from meta.parameter_tuning.dirichlet_prior_ndcg_estimator import DirichletPriorNdcgEstimator
 from meta.parameter_tuning.grid_search import perform_grid_search
 from meta.parameter_tuning.random_search import perform_random_search
 
@@ -60,7 +64,6 @@ if __name__ == '__main__':
         cfg, query_path, query_start, split_ratio
     )
 
-
     # Define the parameter grid
     param_grid = {
         'k1': np.linspace(1.6, 1.8, num=20),
@@ -107,3 +110,91 @@ if __name__ == '__main__':
     print('Best parameters (random_search): ', random_search.best_params_)
     print('Training score (random_search): ', random_search.best_score_)
     print('Test score (random_search): ', test_score)
+    
+    # Define the parameter grid
+    pl_param_grid = {
+        's': np.linspace(0, 8, num=200),
+    }
+
+    # Initialize the estimator
+    pl_estimator = PivotedLengthNdcgEstimator(cfg, query_start_train)
+
+    # Initialize the grid search
+    # cv is the number of folds for cross validation
+    pl_grid_search = perform_grid_search(pl_estimator, pl_param_grid, queries_train, cv=cv, verbose=logging_level)
+    pl_best_model = PivotedLengthNdcgEstimator(
+        cfg = cfg, 
+        query_start = query_start_test,
+        s = pl_grid_search.best_params_['s'],
+    )
+    pl_test_score = pl_best_model.score(queries_test)
+
+    print('PivotedLength Best parameters (grid_search): ', pl_grid_search.best_params_)
+    print('PivotedLength Training score (grid_search): ', pl_grid_search.best_score_)
+    print('PivotedLength Test score (grid_search): ', pl_test_score)
+
+    # Define the parameter grid
+    ad_param_grid = {
+        'delta': np.linspace(0, 8, num=200),
+    }
+
+    # Initialize the estimator
+    ad_estimator = AbsoluteDiscountNdcgEstimator(cfg, query_start_train)
+
+    # Initialize the grid search
+    # cv is the number of folds for cross validation
+    ad_grid_search = perform_grid_search(ad_estimator, ad_param_grid, queries_train, cv=cv, verbose=logging_level)
+    ad_best_model = AbsoluteDiscountNdcgEstimator(
+        cfg = cfg, 
+        query_start = query_start_test,
+        delta = ad_grid_search.best_params_['delta'],
+    )
+    ad_test_score = ad_best_model.score(queries_test)
+
+    print('AbsoluteDiscount Best parameters (grid_search): ', ad_grid_search.best_params_)
+    print('AbsoluteDiscount Training score (grid_search): ', ad_grid_search.best_score_)
+    print('AbsoluteDiscount Test score (grid_search): ', ad_test_score)
+
+    # Define the parameter grid
+    jm_param_grid = {
+        'l': np.linspace(0, 8, num=200),
+    }
+
+    # Initialize the estimator
+    jm_estimator = JelinekMercerNdcgEstimator(cfg, query_start_train)
+
+    # Initialize the grid search
+    # cv is the number of folds for cross validation
+    jm_grid_search = perform_grid_search(jm_estimator, jm_param_grid, queries_train, cv=cv, verbose=logging_level)
+    jm_best_model = JelinekMercerNdcgEstimator(
+        cfg = cfg, 
+        query_start = query_start_test,
+        l = jm_grid_search.best_params_['l'],
+    )
+    jm_test_score = jm_best_model.score(queries_test)
+
+    print('JelinekMercer Best parameters (grid_search): ', jm_grid_search.best_params_)
+    print('JelinekMercer Training score (grid_search): ', jm_grid_search.best_score_)
+    print('JelinekMercer Test score (grid_search): ', jm_test_score)
+
+    # Define the parameter grid
+    dp_param_grid = {
+        'mu': np.linspace(0, 5000, num=200),
+    }
+
+    # Initialize the estimator
+    dp_estimator = DirichletPriorNdcgEstimator(cfg, query_start_train)
+
+    # Initialize the grid search
+    # cv is the number of folds for cross validation
+    dp_grid_search = perform_grid_search(dp_estimator, dp_param_grid, queries_train, cv=cv, verbose=logging_level)
+    dp_best_model = DirichletPriorNdcgEstimator(
+        cfg = cfg, 
+        query_start = query_start_test,
+        mu = dp_grid_search.best_params_['mu'],
+    )
+    dp_test_score = dp_best_model.score(queries_test)
+
+    print('DirichletPrior Best parameters (grid_search): ', dp_grid_search.best_params_)
+    print('DirichletPrior Training score (grid_search): ', dp_grid_search.best_score_)
+    print('DirichletPrior Test score (grid_search): ', dp_test_score)
