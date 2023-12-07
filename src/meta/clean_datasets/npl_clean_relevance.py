@@ -49,5 +49,5 @@ with open("../../../datasets/npl/rlv-ass") as f:
 with open("../../../datasets/npl/relevances.txt", "a") as f:
     for index, relevance_list in enumerate(relevances_list):
         for relevance in relevance_list:
-            f.write(str(index + 1) + " " + relevance + "\n")
+            f.write(str(index + 1) + " " + relevance + " "+ "1"+ "\n")
 
